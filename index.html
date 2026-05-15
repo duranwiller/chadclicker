@@ -9,26 +9,29 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #2b1b1b;
+  background: radial-gradient(circle at top, #3a1f1f, #1a0f0f);
   color: white;
   overflow: hidden;
 }
 
+/* TOP BAR */
 .top {
   position: absolute;
-  top: 0;
+  top: 10px;
   width: 100%;
   text-align: center;
-  padding: 10px;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
+  text-shadow: 0 0 10px black;
 }
 
+/* MAIN LAYOUT */
 .container {
   display: flex;
   height: 100vh;
 }
 
+/* LEFT SIDE */
 .left {
   flex: 1;
   display: flex;
@@ -37,58 +40,85 @@ body {
   align-items: center;
 }
 
+/* FLOATING CHAD */
 .chad {
-  width: 260px;
+  width: 270px;
   border-radius: 20px;
   cursor: pointer;
-  transition: 0.05s;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  animation: float 3s ease-in-out infinite;
+  transition: transform 0.15s;
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
 }
 
 .chad:active {
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* STATS */
 .stats {
-  margin-top: 20px;
+  margin-top: 25px;
   font-size: 18px;
   text-align: center;
-  line-height: 1.5em;
+  line-height: 1.6em;
+  opacity: 0.95;
 }
 
+/* RIGHT SHOP */
 .right {
-  width: 420px;
-  background: #f0c27b;
+  width: 430px;
+  background: linear-gradient(180deg, #f2c27d, #e0a85a);
   color: black;
   padding: 15px;
   overflow-y: auto;
 }
 
+/* TITLE */
 .shop-title {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 }
 
+/* UPGRADE BOX */
 .upgrade {
-  background: #ffe0a3;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 12px;
+  background: rgba(255,255,255,0.5);
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 14px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: 0.15s;
+  font-weight: bold;
 }
 
 .upgrade:hover {
-  background: #ffd27a;
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.7);
+}
+
+.upgrade:active {
+  transform: scale(0.98);
 }
 
 .small {
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.7;
+}
+
+/* BUTTON TEXT STYLE IMPROVEMENT */
+.statLabel {
+  font-weight: bold;
+  opacity: 0.9;
 }
 </style>
 </head>
@@ -110,16 +140,16 @@ body {
     />
 
     <div class="stats">
-      Per Click: <span id="cpc">1</span><br>
-      Auto: <span id="auto">0</span>/sec<br><br>
-
-      Ascensions: <span id="asc">0</span><br>
-      Ascension Bank: <span id="bank">0</span>
+      <div><span class="statLabel">Per Click:</span> <span id="cpc">1</span></div>
+      <div><span class="statLabel">Auto:</span> <span id="auto">0</span>/sec</div>
+      <br>
+      <div><span class="statLabel">Ascension Multiplier:</span> <span id="asc">0</span>x</div>
+      <div><span class="statLabel">Ascension Bank:</span> <span id="bank">0</span>x</div>
     </div>
 
   </div>
 
-  <!-- RIGHT SHOP -->
+  <!-- RIGHT -->
   <div class="right">
 
     <div class="shop-title">Click Power</div>
@@ -142,17 +172,17 @@ body {
 
     <div class="upgrade" onclick="claimAscension()">
       <div>
-        CLAIM ASCENSION<br>
+        ASCEND<br>
         <span class="small">Reset run, gain permanent multiplier</span>
       </div>
       <div>RESET</div>
     </div>
 
   </div>
-
 </div>
 
 <script>
+
 let score = 0;
 let cpc = 1;
 let auto = 0;
@@ -165,6 +195,7 @@ let ascensions = 0;
 let ascensionBank = 0;
 let totalSpent = 0;
 
+/* SCALING FUNCTION */
 function calcAscensionGain(spent) {
   return Math.floor(Math.log10(spent + 10) * Math.sqrt(spent / 50));
 }
@@ -213,7 +244,7 @@ function buyAuto() {
   }
 }
 
-/* RESET / ASCEND */
+/* ASCEND */
 function claimAscension() {
   ascensions += ascensionBank;
 
@@ -230,12 +261,14 @@ function claimAscension() {
   update();
 }
 
+/* PASSIVE TICK */
 setInterval(() => {
   score += auto * (1 + ascensions);
   update();
 }, 1000);
 
 update();
+
 </script>
 
 </body>
