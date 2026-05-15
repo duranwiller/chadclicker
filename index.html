@@ -2,128 +2,172 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure Content</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chad Willer Clicker</title>
+
   <style>
-    * {
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-    body {
-      background: black;
-      overflow: hidden;
+      background: linear-gradient(to bottom, #111, #222);
       color: white;
-    }
-    video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      background: black;
-    }
-    #overlay {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.95); /* darker overlay for realism */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      padding: 20px;
-    }
-    .card {
-      background: #111827;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 400px;
-      width: 100%;
+      font-family: Arial, sans-serif;
       text-align: center;
     }
-    h2 {
+
+    h1 {
+      margin-top: 30px;
+      font-size: 3rem;
+      text-shadow: 2px 2px 10px black;
+    }
+
+    #score {
+      font-size: 2rem;
+      margin: 20px;
+    }
+
+    #perClick {
       margin-bottom: 20px;
+      color: #ccc;
     }
-    p {
-      margin-bottom: 30px;
-    }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      background: #2563eb;
-      border: none;
-      border-radius: 8px;
-      color: white;
+
+    #chad {
+      width: 260px;
+      border-radius: 20px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: transform 0.08s;
+      border: 4px solid white;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
     }
-    .btn:hover {
-      background-color: #3b82f6;
+
+    #chad:active {
+      transform: scale(0.94);
+    }
+
+    .shop {
+      margin-top: 40px;
+      background: rgba(255,255,255,0.08);
+      padding: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 15px;
+    }
+
+    button {
+      background: white;
+      color: black;
+      border: none;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    .footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
-  <video id="vid" loop playsinline preload="auto">
-    <source src="videoqr.mp4" type="video/mp4" />
-  </video>
 
-  <div id="overlay">
-    <div class="card">
-      <h2>Verification Required</h2>
-      <p>Please click the button below to verify you're not a bot</p>
-      <button class="btn" onclick="start()">I'm not a bot</button>
-    </div>
+  <h1>CHAD WILLER CLICKER</h1>
+
+  <div id="score">Chad Points: 0</div>
+  <div id="perClick">Points Per Click: 1</div>
+
+  <!-- Replace image URL if you want -->
+  <img
+    id="chad"
+    src="https://i.imgur.com/8QfQF8M.png"
+    alt="Chad"
+  >
+
+  <div class="shop">
+    <h2>UPGRADES</h2>
+
+    <button onclick="buyUpgrade()">
+      +1 Per Click
+      <br>
+      Cost: <span id="upgradeCost">10</span>
+    </button>
+
+    <button onclick="buyAutoClicker()">
+      Auto Clicker (+1/sec)
+      <br>
+      Cost: <span id="autoCost">50</span>
+    </button>
+  </div>
+
+  <div class="footer">
+    made for the chad willer grindset
   </div>
 
   <script>
-    const webhookURL = "https://discord.com/api/webhooks/1470223913991802920/MzSJrTFcTKt18ntOlPi0NIYX_YCFws1CnwiukNwajVWahr7cumaPVsXK6YbHYl2k06Dr";
+    let score = 0;
+    let perClick = 1;
 
-    async function start() {
-      const overlay = document.getElementById("overlay");
-      const video = document.getElementById("vid");
+    let upgradeCost = 10;
 
-      // hide overlay
-      overlay.style.display = "none";
+    let autoClickers = 0;
+    let autoCost = 50;
 
-      try {
-        // ensure video plays
-        video.load();
-        video.muted = false;
-        video.volume = 1;
+    const scoreText = document.getElementById("score");
+    const perClickText = document.getElementById("perClick");
+    const upgradeCostText = document.getElementById("upgradeCost");
+    const autoCostText = document.getElementById("autoCost");
 
-        // play video
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          await playPromise;
-        }
+    document.getElementById("chad").addEventListener("click", () => {
+      score += perClick;
+      updateUI();
+    });
 
-        // fullscreen (optional)
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-        }
+    function buyUpgrade() {
+      if (score >= upgradeCost) {
+        score -= upgradeCost;
+        perClick++;
 
-        sendWebhook();
+        upgradeCost = Math.floor(upgradeCost * 1.5);
 
-      } catch (err) {
-        console.log("Playback failed:", err);
+        updateUI();
       }
     }
 
-    async function sendWebhook() {
-      try {
-        await fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content: "some lil broski js got RICK ROLLED"
-          }),
-        });
-      } catch (e) {}
+    function buyAutoClicker() {
+      if (score >= autoCost) {
+        score -= autoCost;
+
+        autoClickers++;
+
+        autoCost = Math.floor(autoCost * 1.8);
+
+        updateUI();
+      }
+    }
+
+    setInterval(() => {
+      score += autoClickers;
+      updateUI();
+    }, 1000);
+
+    function updateUI() {
+      scoreText.innerText = "Chad Points: " + score;
+      perClickText.innerText = "Points Per Click: " + perClick;
+
+      upgradeCostText.innerText = upgradeCost;
+      autoCostText.innerText = autoCost;
     }
   </script>
+
 </body>
 </html>
